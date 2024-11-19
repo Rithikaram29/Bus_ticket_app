@@ -35,7 +35,23 @@ const resetTickets = async (req, res, next) => {
 
 }
 
+//get buses
+const getBuses = async (req,res,next)=>{
+    try {
+        const buses = await Bus.find();
+        if(!buses){
+            res.status(404);
+            return new Error("Could not find buses");
+        }
+
+        res.status(202).json(buses)
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     createBus, 
-    resetTickets
+    resetTickets,
+    getBuses
 };
