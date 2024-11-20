@@ -1,6 +1,6 @@
 const Bus = require('../models/adminModel');
 
-//createing the bus
+//creating the bus
 const createBus = async (req, res, next) => {
     try {
         const newBus = await Bus.create(req.body)
@@ -16,7 +16,7 @@ const createBus = async (req, res, next) => {
     }
 }
 
-//resetting the bus
+//resetting the bus tickets
 const resetTickets = async (req, res, next) => {
     const busId = req.params.id
     try {

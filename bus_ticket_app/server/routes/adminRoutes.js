@@ -9,3 +9,5 @@ const router = Router();
 router.get("/", getBuses);
 router.post("/", createBus);
 router.put("/:id", resetTickets);
+
+module.exports = router;
