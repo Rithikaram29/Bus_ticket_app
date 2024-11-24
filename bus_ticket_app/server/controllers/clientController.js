@@ -94,8 +94,13 @@ const cancelTicket = async (req,res,next)=>{
 //Get bus details
 const getBusdetails = async(req,res,next)=>{
     try {
-        const allBuses = await Bus.find({},{'seats.assignedTo': 0});
-        res.status(400).json(allBuses)
+        if(req.user.role === "customer"){
+            const allBuses = await Bus.find({},{'seats.assignedTo': 0});
+            res.status(400).json(allBuses)
+        }else{
+            res.status(500).json({error:"Not Authorised!"})
+        }
+      
     } catch (error) {
         res.status(500).json({error})
     }
