@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const UserRole = Object.freeze({
+    ADMIN: "admin",
+    CUSTOMER: "customer"
+})
+
 const userDetails = new Schema({
     userName:{
         type: String,
@@ -23,8 +28,8 @@ const userDetails = new Schema({
     },
     role:{
         type:String,
-        enum:["admin", "customer"],
-        default: "customer"
+        enum: Object.values(UserRole),
+        default: UserRole.CUSTOMER
     },
 
     name: String,
@@ -32,4 +37,4 @@ const userDetails = new Schema({
 
 const User = mongoose.model("User", userDetails);
 
-module.exports = User;
+module.exports = {User, UserRole};
