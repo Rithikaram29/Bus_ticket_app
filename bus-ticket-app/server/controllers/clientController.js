@@ -2,6 +2,7 @@
 // That is book tickets and cancel tickets.
 
 const Bus = require('../models/busModel');
+const {UserRole} = require('../models/userDetailModel');
 
 // To book tickets
 const bookTicket = async (req,res,next)=>{
@@ -45,7 +46,7 @@ const bookTicket = async (req,res,next)=>{
        currentBus.save();
 
     } catch (error) {
-        next(error)
+        res.status(500).json({error: error.message})
     }
 }
 
@@ -86,7 +87,7 @@ const cancelTicket = async (req,res,next)=>{
        currentBus.save();
 
     } catch (error) {
-        next(error)
+        res.status(500).json({error: error.message})
     }
 }
 
@@ -94,7 +95,7 @@ const cancelTicket = async (req,res,next)=>{
 //Get bus details
 const getBusdetails = async(req,res,next)=>{
     try {
-        if(req.user.role === "customer"){
+        if(req.user.role === UserRole.CUSTOMER){
             const allBuses = await Bus.find({},{'seats.assignedTo': 0});
             res.status(400).json(allBuses)
         }else{
