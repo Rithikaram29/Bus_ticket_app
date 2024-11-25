@@ -6,7 +6,7 @@ const port = process.env.PORT || 4000
 const app = express();
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/clientRoute");
-const authRoutes = require("./loginRegistration/routes/userloginRoutes")
+const authRoutes = require("./routes/userAuthRoutes")
 const {authenticateToken} = require("./middlewares/authentication");
 
 

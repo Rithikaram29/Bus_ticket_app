@@ -1,7 +1,7 @@
 //users doesn't have to create anything in the db. They just have to modify the existing data. 
 // That is book tickets and cancel tickets.
 
-const Bus = require('../models/adminModel');
+const Bus = require('../models/busModel');
 
 // To book tickets
 const bookTicket = async (req,res,next)=>{

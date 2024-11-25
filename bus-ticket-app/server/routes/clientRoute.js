@@ -6,8 +6,8 @@ const { bookTicket,
 
     const router = Router();
 
-    router.get("/", getBusdetails);
-    router.put("/book/:id",bookTicket);
-    router.put("/cancel/:id",cancelTicket);
+    router.get("/bus", getBusdetails);
+    router.put("/book-ticket/:id",bookTicket);
+    router.put("/cancel-ticket/:id",cancelTicket);
 
     module.exports = router;

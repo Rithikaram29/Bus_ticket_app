@@ -1,4 +1,4 @@
-const Bus = require('../models/adminModel');
+const Bus = require('../models/busModel');
 
 //creating the bus
 const createBus = async (req, res, next) => {

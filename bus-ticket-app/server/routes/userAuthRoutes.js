@@ -1,6 +1,6 @@
 const {Router} = require("express");
 const router = Router();
-const {userRegistration,userLogin} = require("../controllers/userLogin")
+const {userRegistration,userLogin} = require("../controllers/authenticationController")
 const cors = require("cors")
 
 

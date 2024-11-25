@@ -6,8 +6,8 @@ const { createBus,
 
 const router = Router();
 
-router.get("/", getBuses);
-router.post("/", createBus);
-router.put("/:id", resetTickets);
+router.get("/bus", getBuses);
+router.post("/bus/create", createBus);
+router.put("/ticket-reset/:id", resetTickets);
 
 module.exports = router;

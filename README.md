@@ -1,7 +1,15 @@
-# Bus_ticket_app
-Bus ticketing app with admin and user side.
+# bus-ticket-app
+bus-ticket-app is the backend system of a bus ticketing app, where users can book and cancel their tickets. And admin can add new buses and reset tickets in their buses.
 
-FIRST STEP:
-1. We need to create an authentication page for adming and users.
-2. Admin would be able to View create new buses, view details of bus tickets and reset the bus tickets.
-3. The users would be able to access the availabile buses and their ticket details, and also book bus tickets. They can also cancel their booked tickets.
+## Table of Contents
+-[Usage](#usage)
+-[FolderStructure](#folderstructure)
+-[Features](#features)
+
+## Usage
+Before 
+
+## Features
+
+## FolderStructure
+
