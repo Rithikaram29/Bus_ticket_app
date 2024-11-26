@@ -6,6 +6,7 @@ const { createBus,
 
 const router = Router();
 
+
 router.get("/bus", getBuses);
 router.post("/bus/create", createBus);
 router.put("/ticket-reset/:id", resetTickets);

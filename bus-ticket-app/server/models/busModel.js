@@ -2,44 +2,44 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 
 const seatSchema = new Schema({
-    seatNumber:{
+    seatNumber: {
         type: String,
         required: true
     },
-    availability:{
+    availability: {
         type: Boolean,
         default: true
     },
-    seatType:{
+    seatType: {
         type: String,
-        enum : ["single sleeper","double sleeper", "seater"],
+        enum: ["single sleeper", "double sleeper", "seater"],
         default: "seater"
     },
-    seatPrice:{
+    seatPrice: {
         type: Number,
         required: true
     },
-    assignedTo:{
-        name:{type: String, required: function(){return !this.availability}},
-        email:{type: String, required: function(){return !this.availability}},
-        phone:{type:Number, required: function(){return !this.availability}}
+    assignedTo: {
+        name: { type: String, required: function () { return !this.availability } },
+        email: { type: String, required: function () { return !this.availability } },
+        phone: { type: Number, required: function () { return !this.availability } }
     }
 })
 
 const pickupSchema = new Schema({
-    city:{
+    city: {
         type: String,
         required: true,
     },
-    landmark:[String]
+    landmark: [String]
 })
 
 const dropSchema = new Schema({
-    city:{
+    city: {
         type: String,
         required: true,
     },
-    landmark:[String]
+    landmark: [String]
 })
 
 
@@ -49,22 +49,22 @@ const busSchema = new Schema({
         type: String,
         required: true
     },
-    pickup:[pickupSchema],
-    drop:[dropSchema],
-    bustype:{
+    pickup: [pickupSchema],
+    drop: [dropSchema],
+    bustype: {
         type: String,
         required: true
     },
-    isAc:{
+    isAc: {
         type: Boolean,
         default: false
     },
-    rating:{
+    rating: {
         type: Number,
         default: 0,
     },
-    seats:[seatSchema]
-    
+    seats: [seatSchema]
+
 })
 
 module.exports = mongoose.model("Bus", busSchema)

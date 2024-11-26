@@ -1,5 +1,5 @@
 const Bus = require('../models/busModel');
-const {UserRole} = require('../models/userDetailModel');
+const { UserRole } = require('../models/userDetailModel');
 
 //creating the bus
 const createBus = async (req, res) => {
@@ -13,9 +13,10 @@ const createBus = async (req, res) => {
         return res.status(201).json(newBus);
 
     } catch (error) {
-        res.status(500).json({error: error.message})
+        res.status(500).json({ error: error.message })
     }
 }
+
 
 //resetting the bus tickets
 const resetTickets = async (req, res) => {
@@ -31,7 +32,7 @@ const resetTickets = async (req, res) => {
 
         res.status(202).json(resetBus);
     } catch (error) {
-        res.status(500).json({error: error.message})
+        res.status(500).json({ error: error.message })
     }
 
 }
@@ -39,19 +40,19 @@ const resetTickets = async (req, res) => {
 //get buses
 const getBuses = async (req, res) => {
     try {
-        if(req.user.role === UserRole.ADMIN){
+        if (req.user.role === UserRole.ADMIN) {
             const buses = await Bus.find();
             if (!buses) {
                 res.status(404);
                 return new Error("Could not find buses");
             }
-    
+
             res.status(202).json(buses)
-        }else{
-            res.status(500).json({error:"Not Auhtorised!"})
+        } else {
+            res.status(500).json({ error: "Not Auhtorised!" })
         }
     } catch (error) {
-        res.status(500).json({error: error.message})
+        res.status(500).json({ error: error.message })
     }
 }
 

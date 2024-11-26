@@ -15,7 +15,6 @@ connectDB();
 app.use(express.json())
 
 
-
 app.use("/admin",authenticateToken, adminRoutes);
 app.use("/user",authenticateToken, userRoutes);
 app.use("/auth",authRoutes)

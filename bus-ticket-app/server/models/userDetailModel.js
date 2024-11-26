@@ -7,27 +7,27 @@ const UserRole = Object.freeze({
 })
 
 const userDetails = new Schema({
-    userName:{
+    userName: {
         type: String,
         required: true,
         unique: true
     },
-    phone:{
+    phone: {
         type: Number,
         required: true,
         unique: true
     },
-    email:{
+    email: {
         type: String,
         required: true,
         unique: true
     },
-    password:{
-        type:String,
+    password: {
+        type: String,
         required: true
     },
-    role:{
-        type:String,
+    role: {
+        type: String,
         enum: Object.values(UserRole),
         default: UserRole.CUSTOMER
     },
@@ -37,4 +37,4 @@ const userDetails = new Schema({
 
 const User = mongoose.model("User", userDetails);
 
-module.exports = {User, UserRole};
+module.exports = { User, UserRole };
