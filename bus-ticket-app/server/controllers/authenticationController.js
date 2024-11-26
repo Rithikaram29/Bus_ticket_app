@@ -1,14 +1,13 @@
-const User = require('../models/userDetailModel');
+const { User, UserRole } = require('../models/userDetailModel');
 const bcrypt = require('bcrypt');
 
-const {generateToken} = require('../utils/jwtUtils');
+const { generateToken } = require('../utils/jwtUtils');
 
 //registration
 const userRegistration = async (req, res, next) => {
     try {
         let { userName, phone, email, password, role, name } = req.body;
 
-        
         const salt = 10;
 
         const hashedPassword = await bcrypt.hash(password, salt)
@@ -20,20 +19,20 @@ const userRegistration = async (req, res, next) => {
             password: hashedPassword
             , name,
             role
-        })
+        });
 
         if (!newUser) {
             res.status(400)
             return new Error("Cannot create user")
-        }
-       
-        res.status(201).json({user: newUser, message:"User created Successfully!"})
+        };
+
+        res.status(201).json({ user: newUser, message: "User created Successfully!" });
 
     } catch (error) {
         console.log(error);
-        res.status(400).json({message: error.message})
+        res.status(400).json({ message: error.message });
     }
-}
+};
 
 //userlogin
 const userLogin = async (req, res, next) => {
@@ -46,7 +45,7 @@ const userLogin = async (req, res, next) => {
             return res.status(404).json({ error: "User not found!" });
         }
 
-        const passwordCorrect = await bcrypt.compare(password, currentUser.password)
+        const passwordCorrect = await bcrypt.compare(password, currentUser.password);
 
         if (!passwordCorrect) {
             res.status(400);
@@ -70,4 +69,4 @@ const userLogin = async (req, res, next) => {
     }
 }
 
-module.exports = {userRegistration,userLogin};
+module.exports = { userRegistration, userLogin };
