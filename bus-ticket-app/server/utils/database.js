@@ -6,11 +6,11 @@ const connectDB = async () => {
     try {
 
         mongoose.connection.on("connected", () => {
-            console.log("connected to MongoDB")
+            console.log("connected to MongoDB");
         })
 
         mongoose.connection.on("error", (error) => {
-            console.log(`error in connection:${error}`)
+            console.log(`error in connection:${error}`);
         })
 
         await mongoose.connect(mongo_uri)
@@ -18,9 +18,9 @@ const connectDB = async () => {
             .catch(err => console.error('Failed to connect to MongoDB:', err));
     } catch (error) {
         console.log(error);
-        process.exit(1)
+        process.exit(1);
     }
-}
+};
 
 
-module.exports = connectDB
+module.exports = connectDB;

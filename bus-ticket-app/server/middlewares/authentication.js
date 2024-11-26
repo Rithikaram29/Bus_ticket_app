@@ -12,18 +12,18 @@ const authenticateToken = (req, res, next) => {
    const authHeader = req.header("Authorization");
 
    if (!authHeader) {
-      return res.Status(401).json({ message: "Unauthorised: Missing Token!" })
+      return res.Status(401).json({ message: "Unauthorised: Missing Token!" });
    }
 
    const token = authHeader.split(" ")[1];
 
    if (!token) {
-      res.status(401).json({ message: "Unauthorized: Invalid token format" })
+      res.status(401).json({ message: "Unauthorized: Invalid token format" });
    }
 
    jwt.verify(token, secretkey, (err, user) => {
       if (err) {
-         return res.status(403).json({ message: "Forbidden:Invalid Token" })
+         return res.status(403).json({ message: "Forbidden:Invalid Token" });
       }
 
       req.user = user;
@@ -31,4 +31,5 @@ const authenticateToken = (req, res, next) => {
    })
 
 }
-module.exports = { authenticateToken }
+
+module.exports = { authenticateToken };

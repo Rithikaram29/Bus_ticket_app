@@ -29,7 +29,7 @@ const bookTicket = async (req, res, next) => {
             res.status(404).json({
                 error: "Some seats are already booked",
                 seatNum: bookedSeats.map((seat) => seat.seatNumber)
-            })
+            });
         } else {
             currentBus.seats.map((seat) => {
                 if (selectedSeatNumbers.includes(seat.seatNumber)) {
@@ -42,7 +42,7 @@ const bookTicket = async (req, res, next) => {
                     }
                 }
             })
-        }
+        };
 
         currentBus.save();
 
@@ -60,9 +60,9 @@ const cancelTicket = async (req, res, next) => {
 
         if (!currentBus) {
             res.status(404).json({ error: "bus not found" })
-        }
+        };
 
-        const selectedSeats = req.body.seats //req.body will contain object with key as seats and value as array of selected seats.
+        const selectedSeats = req.body.seats; //req.body will contain object with key as seats and value as array of selected seats.
         //structure of the incoming req.body will be {seats:[{seatNo:"", name:"", phone:"", email:""},{seatNo:"", name:"", phone:"", email:""}]}
 
         //getting the seatnumber to be booked.
@@ -84,14 +84,14 @@ const cancelTicket = async (req, res, next) => {
                     seat.availability = true;
                 }
             })
-        }
+        };
 
         currentBus.save();
 
     } catch (error) {
-        res.status(500).json({ error: error.message })
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 
 //Get bus details
@@ -99,15 +99,15 @@ const getBusdetails = async (req, res, next) => {
     try {
         if (req.user.role === UserRole.CUSTOMER) {
             const allBuses = await Bus.find({}, { 'seats.assignedTo': 0 });
-            res.status(400).json(allBuses)
+            res.status(400).json(allBuses);
         } else {
-            res.status(500).json({ error: "Not Authorised!" })
+            res.status(500).json({ error: "Not Authorised!" });
         }
 
     } catch (error) {
-        res.status(500).json({ error })
+        res.status(500).json({ error });
     }
-}
+};
 
 
 module.exports = {

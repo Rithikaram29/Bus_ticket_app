@@ -24,7 +24,7 @@ const seatSchema = new Schema({
         email: { type: String, required: function () { return !this.availability } },
         phone: { type: Number, required: function () { return !this.availability } }
     }
-})
+});
 
 const pickupSchema = new Schema({
     city: {
@@ -32,7 +32,7 @@ const pickupSchema = new Schema({
         required: true,
     },
     landmark: [String]
-})
+});
 
 const dropSchema = new Schema({
     city: {
@@ -40,7 +40,7 @@ const dropSchema = new Schema({
         required: true,
     },
     landmark: [String]
-})
+});
 
 
 
@@ -65,6 +65,6 @@ const busSchema = new Schema({
     },
     seats: [seatSchema]
 
-})
+});
 
-module.exports = mongoose.model("Bus", busSchema)
+module.exports = mongoose.model("Bus", busSchema);

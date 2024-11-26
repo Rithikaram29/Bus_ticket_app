@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const UserRole = Object.freeze({
     ADMIN: "admin",
     CUSTOMER: "customer"
-})
+});
 
 const userDetails = new Schema({
     userName: {
@@ -33,7 +33,7 @@ const userDetails = new Schema({
     },
 
     name: String,
-})
+});
 
 const User = mongoose.model("User", userDetails);
 
