@@ -1,9 +1,9 @@
-const {Router} = require("express");
+import {Router} from "express";
 
 
-const { bookTicket,
+import { bookTicket,
     cancelTicket,
-    getBusdetails} = require("../controllers/clientController");
+    getBusdetails} from "../controllers/clientController";
 
     const router = Router();
 
@@ -11,4 +11,4 @@ const { bookTicket,
     router.put("/book-ticket/:id",bookTicket);
     router.put("/cancel-ticket/:id",cancelTicket);
 
-    module.exports = router;
+  export default router;

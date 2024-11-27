@@ -1,14 +1,21 @@
-const { User, UserRole } = require('../models/userDetailModel');
-const bcrypt = require('bcrypt');
+import { User, UserRole } from '../models/userDetailModel';
+import bcrypt from 'bcrypt';
+import { Request,Response,RequestHandler,NextFunction } from 'express';
 
 const { generateToken } = require('../utils/jwtUtils');
 
+interface CustomRequest extends Request {
+    user : { _id: number;
+        email: string;
+        role: string }
+}
+
 //registration
-const userRegistration = async (req, res, next) => {
+const userRegistration:RequestHandler = async (req: CustomRequest, res:Response, next:NextFunction) => {
     try {
         let { userName, phone, email, password, role, name } = req.body;
 
-        const salt = 10;
+        const salt: number = 10;
 
         const hashedPassword = await bcrypt.hash(password, salt)
 
@@ -23,33 +30,34 @@ const userRegistration = async (req, res, next) => {
 
         if (!newUser) {
             res.status(400)
-            return new Error("Cannot create user")
+           throw new Error("Cannot create user")
         };
 
         res.status(201).json({ user: newUser, message: "User created Successfully!" });
 
-    } catch (error) {
+    } catch (error: any) {
         console.log(error);
         res.status(400).json({ message: error.message });
     }
 };
 
 //userlogin
-const userLogin = async (req, res, next) => {
+const userLogin:RequestHandler  = async (req: CustomRequest, res:Response, next:NextFunction) => {
     try {
         const { userName, password } = req.body;
 
         const currentUser = await User.findOne({ userName: userName });
 
         if (!currentUser) {
-            return res.status(404).json({ error: "User not found!" });
+            res.status(404).json({ error: "User not found!" });
+            return;
         }
 
         const passwordCorrect = await bcrypt.compare(password, currentUser.password);
 
         if (!passwordCorrect) {
             res.status(400);
-            return new Error("Password incorrect!");
+           throw new Error("Password incorrect!");
         }
 
         const token = generateToken(currentUser);
@@ -57,16 +65,9 @@ const userLogin = async (req, res, next) => {
         res.status(200).json(token);
 
 
-        // res.status(201).json({
-        //     userName: currentUser.userName,
-        //     phone: currentUser.phone,
-        //     email: currentUser.email,
-        //     name: currentUser.name
-        // })
-
-    } catch (error) {
+    } catch (error:any) {
         res.status(500).json({ error: error.message });
     }
 }
 
-module.exports = { userRegistration, userLogin };
+export { userRegistration, userLogin };

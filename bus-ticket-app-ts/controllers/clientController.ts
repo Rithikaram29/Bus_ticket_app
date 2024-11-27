@@ -1,59 +1,92 @@
-//users doesn't have to create anything in the db. They just have to modify the existing data. 
-// That is book tickets and cancel tickets.
+import Bus from '../models/busModel';
+import { UserRole } from '../models/userDetailModel';
+import { Request,RequestHandler,Response } from 'express';
 
-const Bus = require('../models/busModel');
-const { UserRole } = require('../models/userDetailModel');
+
+//interface structure
+
+interface SelectedSeat {
+    seatNumber: string;
+    name: string;
+    phone: number;
+    email: string;
+}
+
+interface Seat {
+    seatNumber: string ; 
+    availability: boolean;
+    seatType: "single sleeper"| "double sleeper"| "seater"
+    seatPrice: number;
+    assignedTo: {
+        name:string;
+        email: string;
+        phone: number;
+    }
+}
+
+
+interface CustomRequest extends Request {
+    user : { _id: number;
+        email: string;
+        role: string}
+}
+
 
 // To book tickets
-const bookTicket = async (req, res, next) => {
+const bookTicket: RequestHandler = async (req: CustomRequest, res:Response) => {
     const busId = req.params.id; //assuming once we are directed to the bus page, the id is added in the params
+    
+    
     try {
         const currentBus = await Bus.findById(busId);
 
         if (!currentBus) {
-            res.status(404).json({ error: "bus not found" })
+            res.status(404).json({ error: "bus not found" });
+            return;
         }
 
-        const selectedSeats = req.body.seats //req.body will contain object with key as seats and value as array of selected seats.
+        const selectedSeats : SelectedSeat[] = req.body.seats //req.body will contain object with key as seats and value as array of selected seats.
         //structure of the incoming req.body will be {seats:[{seatNo:"", name:"", phone:"", email:""},{seatNo:"", name:"", phone:"", email:""}]}
 
         //getting the seatnumber to be booked.
-        const selectedSeatNumbers = selectedSeats.map((ele) => ele.seatNo);
+        const selectedSeatNumbers = selectedSeats.map((ele) => ele.seatNumber);
 
         //using the eselected seatnumber to check if that is already booked to avoid error
-        const bookedSeats = currentBus.seats.filter((seat) =>
+        const bookedSeats =currentBus? currentBus.seats.filter((seat) =>
             selectedSeatNumbers.includes(seat.seatNumber) && seat.availability === false
-        );
+        ) : [];
 
-        if (bookedSeats > 0) {
+        if (bookedSeats.length > 0) {
             res.status(404).json({
                 error: "Some seats are already booked",
                 seatNum: bookedSeats.map((seat) => seat.seatNumber)
             });
         } else {
-            currentBus.seats.map((seat) => {
+            currentBus? currentBus.seats.map((seat: Seat) => {
                 if (selectedSeatNumbers.includes(seat.seatNumber)) {
                     seat.availability = false;
-                    const matchingSeat = selectedSeats.filter((ele) => ele.seatNumber === seat.seatNumber)
+                    const matchingSeat= selectedSeats.filter((ele) => ele.seatNumber === seat.seatNumber)
+                   if(matchingSeat.length > 0){
                     seat.assignedTo = {
-                        name: matchingSeat.name,
-                        email: matchingSeat.email,
-                        phone: matchingSeat.phone
-                    }
+                        name: matchingSeat[0].name,    
+                        email: matchingSeat[0].email,
+                        phone:matchingSeat[0].phone  
+                    };
+                   }
                 }
-            })
+            }): []
         };
 
         currentBus.save();
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message })
     }
 }
 
 //To cancel tickets
 
-const cancelTicket = async (req, res, next) => {
+const cancelTicket: RequestHandler = async (req: CustomRequest, res:Response) => {
     const busId = req.params.id; //assuming once we are directed to the bus page, the id is added in the params
     try {
         const currentBus = await Bus.findById(busId);
@@ -62,40 +95,40 @@ const cancelTicket = async (req, res, next) => {
             res.status(404).json({ error: "bus not found" })
         };
 
-        const selectedSeats = req.body.seats; //req.body will contain object with key as seats and value as array of selected seats.
+        const selectedSeats : SelectedSeat[]  = req.body.seats; //req.body will contain object with key as seats and value as array of selected seats.
         //structure of the incoming req.body will be {seats:[{seatNo:"", name:"", phone:"", email:""},{seatNo:"", name:"", phone:"", email:""}]}
 
         //getting the seatnumber to be booked.
-        const selectedSeatNumbers = selectedSeats.map((ele) => ele.seatNo);
+        const selectedSeatNumbers = selectedSeats.map((ele) => ele.seatNumber);
 
         //using the eselected seatnumber to check if that is already booked to avoid error
-        const bookedSeats = currentBus.seats.filter((seat) =>
+        const bookedSeats = currentBus? currentBus.seats.filter((seat) =>
             selectedSeatNumbers.includes(seat.seatNumber) && seat.availability === true
-        );
+        ): [];
 
-        if (bookedSeats > 0) {
+        if (bookedSeats.length > 0) {
             res.status(404).json({
                 error: "Some seats are not booked by you",
                 seatNum: bookedSeats.map((seat) => seat.seatNumber)
             })
         } else {
-            currentBus.seats.map((seat) => {
+            currentBus ? currentBus.seats.map((seat) => {
                 if (selectedSeatNumbers.includes(seat.seatNumber)) {
                     seat.availability = true;
                 }
-            })
+            }):[]
         };
 
-        currentBus.save();
+        currentBus ? currentBus.save():  new Error("Cannot save canceled ticket")
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 };
 
 
 //Get bus details
-const getBusdetails = async (req, res, next) => {
+const getBusdetails: RequestHandler = async (req: CustomRequest, res:Response) => {
     try {
         if (req.user.role === UserRole.CUSTOMER) {
             const allBuses = await Bus.find({}, { 'seats.assignedTo': 0 });
@@ -110,7 +143,7 @@ const getBusdetails = async (req, res, next) => {
 };
 
 
-module.exports = {
+export {
     bookTicket,
     cancelTicket,
     getBusdetails

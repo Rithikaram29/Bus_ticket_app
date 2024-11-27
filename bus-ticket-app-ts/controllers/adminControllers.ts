@@ -3,7 +3,9 @@ import { Request, RequestHandler, Response } from 'express';
 import { UserRole } from '../models/userDetailModel';
 
 interface CustomRequest extends Request {
-    user : { role : string }
+    user : { _id: number;
+        email: string;
+        role: string }
 }
 
 //creating the bus
