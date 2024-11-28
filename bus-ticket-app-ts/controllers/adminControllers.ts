@@ -1,7 +1,7 @@
-import Bus from '../models/busModel';
-import { Request, RequestHandler, Response } from 'express';
-import { UserRole } from '../models/userDetailModel';
-import { Types } from 'mongoose';
+import Bus from "../models/busModel";
+import { Request, RequestHandler, Response } from "express";
+import { UserRole } from "../models/userDetailModel";
+import { Types } from "mongoose";
 
 interface CustomRequest extends Request {
     user : { _id: Types.ObjectId;

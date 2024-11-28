@@ -1,9 +1,9 @@
-import { User, UserRole } from '../models/userDetailModel';
-import bcrypt from 'bcrypt';
-import { Request,Response,RequestHandler,NextFunction } from 'express';
-import { Types } from 'mongoose';
+import { User, UserRole } from "../models/userDetailModel";
+import bcrypt from "bcrypt";
+import { Request,Response,RequestHandler,NextFunction } from "express";
+import { Types } from "mongoose";
 
-const { generateToken } = require('../utils/jwtUtils');
+import { generateToken } from "../utils/jwtUtils";
 
 interface CustomRequest extends Request {
     user : { _id: Types.ObjectId;
@@ -47,7 +47,7 @@ const userLogin:RequestHandler  = async (req: CustomRequest, res:Response, next:
     try {
         const { userName, password } = req.body;
 
-        const currentUser = await User.findOne({ userName: userName });
+        const currentUser: any = await User.findOne({ userName: userName });
 
         if (!currentUser) {
             res.status(404).json({ error: "User not found!" });

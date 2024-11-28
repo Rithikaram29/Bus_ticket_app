@@ -1,54 +1,56 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { Types } from 'mongoose';
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Types } from "mongoose";
 
-const secretkey = process.env.SECRET_KEY!
+const secretkey = process.env.SECRET_KEY!;
 if (!secretkey) {
-   throw new Error("secret key is not set!")
+  throw new Error("secret key is not set!");
 }
 
 interface CustomRequest extends Request {
-   user: {
-      _id: Types.ObjectId;
-      email: string;
-      role: string
-   }
+  user: {
+    _id: Types.ObjectId;
+    email: string;
+    role: string;
+  };
 }
 
 //to authenticate token
-const authenticateToken: RequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => {
-   const authHeader = req.header("Authorization");
+const authenticateToken: RequestHandler = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.header("Authorization");
 
-   if (!authHeader) {
-       res.status(401).json({ message: "Unauthorised: Missing Token!" });
-       return;
-   }
+  if (!authHeader) {
+    res.status(401).json({ message: "Unauthorised: Missing Token!" });
+    return;
+  }
 
-   const token = authHeader.split(" ")[1];
+  const token = authHeader.split(" ")[1];
 
-   if (!token) {
-      res.status(401).json({ message: "Unauthorized: Invalid token format" });
-   }
+  if (!token) {
+    res.status(401).json({ message: "Unauthorized: Invalid token format" });
+  }
 
-   jwt.verify(token, secretkey, (err, user) => {
-      if (err) {
-         return res.status(403).json({ message: "Forbidden:Invalid Token" });
-      }
+  jwt.verify(token, secretkey, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Forbidden:Invalid Token" });
+    }
 
-      if(user){
-         req.user = user as {
-            _id: Types.ObjectId;
-            email: string;
-            role: string
-         };
-      }
-     
+    if (user) {
+      req.user = user as {
+        _id: Types.ObjectId;
+        email: string;
+        role: string;
+      };
+    }
 
-      next();
-   })
-
-}
+    next();
+  });
+};
 
 export { authenticateToken };

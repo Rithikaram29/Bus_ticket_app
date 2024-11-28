@@ -1,7 +1,7 @@
-import Bus from '../models/busModel';
-import { UserRole } from '../models/userDetailModel';
-import { Request,RequestHandler,Response } from 'express';
-import { Types } from 'mongoose';
+import Bus from "../models/busModel";
+import { UserRole } from "../models/userDetailModel";
+import { Request,RequestHandler,Response } from "express";
+import { Types } from "mongoose";
 
 
 //interface structure
