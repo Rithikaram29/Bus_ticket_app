@@ -52,7 +52,7 @@ const bookTicket: RequestHandler = async (
     //structure of the incoming req.body will be {seats:[{seatNo:"", name:"", phone:"", email:""},{seatNo:"", name:"", phone:"", email:""}]}
 
     //getting the seatnumber to be booked.
-    const selectedSeatNumbers = selectedSeats.map((ele) => ele.seatNumber);
+    const selectedSeatNumbers = selectedSeats.map((selSeat) => selSeat.seatNumber);
 
     //using the eselected seatnumber to check if that is already booked to avoid error
     const bookedSeats = currentBus
@@ -74,7 +74,7 @@ const bookTicket: RequestHandler = async (
             if (selectedSeatNumbers.includes(seat.seatNumber)) {
               seat.availability = false;
               const matchingSeat = selectedSeats.filter(
-                (ele) => ele.seatNumber === seat.seatNumber
+                (selSeat) => selSeat.seatNumber === seat.seatNumber
               );
               if (matchingSeat.length > 0) {
                 seat.assignedTo = {
@@ -112,7 +112,7 @@ const cancelTicket: RequestHandler = async (
     //structure of the incoming req.body will be {seats:[{seatNo:"", name:"", phone:"", email:""},{seatNo:"", name:"", phone:"", email:""}]}
 
     //getting the seatnumber to be booked.
-    const selectedSeatNumbers = selectedSeats.map((ele) => ele.seatNumber);
+    const selectedSeatNumbers = selectedSeats.map((selSeat) => selSeat.seatNumber);
 
     //using the eselected seatnumber to check if that is already booked to avoid error
     const bookedSeats = currentBus
