@@ -1,9 +1,15 @@
 import Bus from '../models/busModel';
 import { UserRole } from '../models/userDetailModel';
 import { Request,RequestHandler,Response } from 'express';
+import { Types } from 'mongoose';
 
 
 //interface structure
+enum SeatType {
+    SingleSleeper = "single sleeper",
+    DoubleSleeper = "double sleeper",
+    Seater = "seater"
+}
 
 interface SelectedSeat {
     seatNumber: string;
@@ -15,7 +21,7 @@ interface SelectedSeat {
 interface Seat {
     seatNumber: string ; 
     availability: boolean;
-    seatType: "single sleeper"| "double sleeper"| "seater"
+    seatType: SeatType
     seatPrice: number;
     assignedTo: {
         name:string;
@@ -26,7 +32,7 @@ interface Seat {
 
 
 interface CustomRequest extends Request {
-    user : { _id: number;
+    user : { _id: Types.ObjectId;
         email: string;
         role: string}
 }

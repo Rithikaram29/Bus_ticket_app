@@ -1,11 +1,12 @@
 import { User, UserRole } from '../models/userDetailModel';
 import bcrypt from 'bcrypt';
 import { Request,Response,RequestHandler,NextFunction } from 'express';
+import { Types } from 'mongoose';
 
 const { generateToken } = require('../utils/jwtUtils');
 
 interface CustomRequest extends Request {
-    user : { _id: number;
+    user : { _id: Types.ObjectId;
         email: string;
         role: string }
 }

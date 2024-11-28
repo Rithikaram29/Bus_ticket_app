@@ -1,12 +1,13 @@
 import Bus from '../models/busModel';
 import { Request, RequestHandler, Response } from 'express';
 import { UserRole } from '../models/userDetailModel';
+import { Types } from 'mongoose';
 
 interface CustomRequest extends Request {
-    user : { _id: number;
+    user : { _id: Types.ObjectId;
         email: string;
-        role: string }
-}
+        role: string; }
+};
 
 //creating the bus
 const createBus: RequestHandler = async (req: CustomRequest, res: Response) => {
@@ -29,7 +30,7 @@ const resetTickets: RequestHandler = async (req: CustomRequest, res: Response) =
     const busId = req.params.id;
     try {
         const resetBus = await Bus.findByIdAndUpdate(
-            busId, { $set: { "seats.$[].availability": true } })
+            busId, { $set: { "seats.$[].availability": true } });
 
         if (!resetBus) {
             res.status(400).json({error: "Cannot reset bus"});
@@ -55,7 +56,7 @@ const getBuses: RequestHandler = async (req: CustomRequest, res: Response) => {
 
             res.status(202).json(buses);
         } else {
-            res.status(500).json({ error: "Not Auhtorised!" });
+            res.status(403).json({ error: "Not Authorised!" });
         }
     } catch (error : any) {
         res.status(500).json({ error: error.message });

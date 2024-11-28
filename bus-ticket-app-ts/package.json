@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev": "nodemon --watch 'server.ts' --exec 'ts-node' server.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",

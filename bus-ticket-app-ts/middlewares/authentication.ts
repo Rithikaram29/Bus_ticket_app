@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Types } from 'mongoose';
 
 const secretkey = process.env.SECRET_KEY!
 if (!secretkey) {
@@ -10,7 +11,7 @@ if (!secretkey) {
 
 interface CustomRequest extends Request {
    user: {
-      _id: number;
+      _id: Types.ObjectId;
       email: string;
       role: string
    }
@@ -38,7 +39,7 @@ const authenticateToken: RequestHandler = (req: CustomRequest, res: Response, ne
 
       if(user){
          req.user = user as {
-            _id: number;
+            _id: Types.ObjectId;
             email: string;
             role: string
          };

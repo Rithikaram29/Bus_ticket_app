@@ -1,9 +1,9 @@
-import * as dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
-import express,{Application} from 'express';
-import  connectDB  from './utils/database';
+import express,{Application} from "express";
+import  connectDB  from "./utils/database";
 import adminRoutes from "./routes/adminRoutes";
 import userRoutes from "./routes/clientRoute";
 import authRoutes from "./routes/userAuthRoutes";

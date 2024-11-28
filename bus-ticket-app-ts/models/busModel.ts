@@ -2,10 +2,16 @@ import mongoose,{Model,Document, Schema} from 'mongoose';
 const schema = mongoose.Schema
 
 //TypeScript interfaces for Schemas
+enum SeatType {
+    SingleSleeper = "single sleeper",
+    DoubleSleeper = "double sleeper",
+    Seater = "seater"
+}
+
 interface Seat {
     seatNumber: string ; 
     availability: boolean;
-    seatType: "single sleeper"| "double sleeper"| "seater"
+    seatType: SeatType;
     seatPrice: number;
     assignedTo: {
         name:string;
@@ -46,8 +52,7 @@ const seatSchema = new Schema<Seat>({
     },
     seatType: {
         type: String,
-        enum: ["single sleeper", "double sleeper", "seater"],
-        default: "seater"
+        default: SeatType.Seater
     },
     seatPrice: {
         type: Number,
