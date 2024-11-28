@@ -1,5 +1,4 @@
 import mongoose, { Model, Document, Schema } from "mongoose";
-const schema = mongoose.Schema;
 
 //TypeScript interfaces for Schemas
 enum SeatType {
@@ -80,7 +79,7 @@ const seatSchema = new Schema<Seat>({
   },
 });
 
-const pickupSchema = new schema<Pickup>({
+const pickupSchema = new Schema<Pickup>({
   city: {
     type: String,
     required: true,
@@ -88,7 +87,7 @@ const pickupSchema = new schema<Pickup>({
   landmark: [String],
 });
 
-const dropSchema = new schema<Drop>({
+const dropSchema = new Schema<Drop>({
   city: {
     type: String,
     required: true,
@@ -96,7 +95,7 @@ const dropSchema = new schema<Drop>({
   landmark: [String],
 });
 
-const busSchema = new schema<Bus>({
+const busSchema = new Schema<Bus>({
   name: {
     type: String,
     required: true,
