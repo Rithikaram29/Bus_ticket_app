@@ -7,7 +7,7 @@ import connectDB from "./utils/database";
 import adminRoutes from "./routes/adminRoutes";
 import userRoutes from "./routes/clientRoute";
 import authRoutes from "./routes/userAuthRoutes";
-import { authenticateToken } from "./middlewares/authentication";
+import  authorisation from "./middlewares/authentication";
 
 const port: number = parseInt(process.env.PORT || "4000", 10);
 if (isNaN(port)) {
@@ -20,8 +20,8 @@ const app: Application = express();
 connectDB();
 app.use(express.json());
 
-app.use("/admin", authenticateToken, adminRoutes);
-app.use("/user", authenticateToken, userRoutes);
+app.use("/admin", authorisation, adminRoutes);
+app.use("/user", authorisation, userRoutes);
 app.use("/auth", authRoutes);
 
 app.listen(port, () => {

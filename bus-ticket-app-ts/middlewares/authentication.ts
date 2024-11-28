@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction, RequestHandler } from "express";
@@ -34,11 +34,13 @@ const authenticateToken: RequestHandler = (
 
   if (!token) {
     res.status(401).json({ message: "Unauthorized: Invalid token format" });
+    return;
   }
 
   jwt.verify(token, secretkey, (err, user) => {
     if (err) {
-      return res.status(403).json({ message: "Forbidden:Invalid Token" });
+      res.status(403).json({ message: "Forbidden:Invalid Token" });
+      return;
     }
 
     if (user) {
@@ -53,4 +55,4 @@ const authenticateToken: RequestHandler = (
   });
 };
 
-export { authenticateToken };
+export default authenticateToken ;
