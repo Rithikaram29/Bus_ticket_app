@@ -2,6 +2,9 @@ import Bus from "../models/busModel";
 import { Request, RequestHandler, Response } from "express";
 import { UserRole } from "../models/userDetailModel";
 import { Types } from "mongoose";
+import DataQueryAbstraction from "../abstraction/databaseMethodAbstraction";
+
+const busServices = new DataQueryAbstraction(Bus);
 
 interface CustomRequest extends Request {
   user: { _id: Types.ObjectId; email: string; role: string };
@@ -10,7 +13,7 @@ interface CustomRequest extends Request {
 //creating the bus
 const createBus: RequestHandler = async (req: CustomRequest, res: Response) => {
   try {
-    const newBus = await Bus.create(req.body);
+    const newBus = await busServices.create(req.body);
     if (!newBus) {
       res.status(400).json({ error: "Cannot create Bus!" });
     }
@@ -28,9 +31,12 @@ const resetTickets: RequestHandler = async (
 ) => {
   const busId = req.params.id;
   try {
-    const resetBus = await Bus.findByIdAndUpdate(busId, {
-      $set: { "seats.$[].availability": true },
-    });
+    const resetBus = await busServices.findOneAndUpdate(
+      { _id: busId },
+      {
+        $set: { "seats.$[].availability": true },
+      }
+    );
 
     if (!resetBus) {
       res.status(400).json({ error: "Cannot reset bus" });
@@ -47,7 +53,7 @@ const resetTickets: RequestHandler = async (
 const getBuses: RequestHandler = async (req: CustomRequest, res: Response) => {
   try {
     if (req.user.role === UserRole.ADMIN) {
-      const buses = await Bus.find();
+      const buses = await busServices.find();
       if (!buses) {
         res.status(404).json({ error: "Could not find buses" });
         return;

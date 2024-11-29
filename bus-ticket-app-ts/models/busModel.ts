@@ -1,30 +1,28 @@
-import mongoose, { Model, Document, Schema } from "mongoose";
+import mongoose, { Model } from "mongoose";
+import SchemaAbstraction from "../abstraction/modelAbstraction";
 
-//TypeScript interfaces for Schemas
-enum SeatType {
-  SingleSleeper = "single sleeper",
-  DoubleSleeper = "double sleeper",
-  Seater = "seater",
+const schemaAbstraction = new SchemaAbstraction();
+//interface
+interface AssignedTo {
+  name: string;
+  email: string;
+  phone: number;
 }
 
-interface Seat {
+interface Seat extends Document {
   seatNumber: string;
   availability: boolean;
   seatType: SeatType;
   seatPrice: number;
-  assignedTo: {
-    name: string;
-    email: string;
-    phone: number;
-  };
+  assignedTo: AssignedTo;
 }
 
-interface Pickup {
+interface Pickup extends Document {
   city: string;
   landmark: string[];
 }
 
-interface Drop {
+interface Drop extends Document {
   city: string;
   landmark: string[];
 }
@@ -39,8 +37,14 @@ interface Bus extends Document {
   seats: Seat[];
 }
 
-//Mongoose Schemas
-const seatSchema = new Schema<Seat>({
+enum SeatType {
+  SingleSleeper = "single sleeper",
+  DoubleSleeper = "double sleeper",
+  Seater = "seater",
+}
+
+//Define seat Schema
+schemaAbstraction.defineSchema("Seat", {
   seatNumber: {
     type: String,
     required: true,
@@ -51,6 +55,7 @@ const seatSchema = new Schema<Seat>({
   },
   seatType: {
     type: String,
+    enum: Object.values(SeatType),
     default: SeatType.Seater,
   },
   seatPrice: {
@@ -60,26 +65,35 @@ const seatSchema = new Schema<Seat>({
   assignedTo: {
     name: {
       type: String,
-      required: function () {
-        return !this.availability;
+      validate: {
+        validator: function (this: any, value: string) {
+          return this.availability || !!value;
+        },
+        message: "Name is required if the seat is unavailable",
       },
     },
     email: {
       type: String,
-      required: function () {
-        return !this.availability;
+      validate: {
+        validator: function (this: any, value: string) {
+          return this.availability || !!value;
+        },
+        message: "Email is required if the seat is unavailable",
       },
     },
     phone: {
       type: Number,
-      required: function () {
-        return !this.availability;
+      validate: {
+        validator: function (this: any, value: string) {
+          return this.availability || !!value;
+        },
+        message: "Phone number is required if the seat is unavailable",
       },
     },
   },
 });
 
-const pickupSchema = new Schema<Pickup>({
+schemaAbstraction.defineSchema("Pickup", {
   city: {
     type: String,
     required: true,
@@ -87,7 +101,7 @@ const pickupSchema = new Schema<Pickup>({
   landmark: [String],
 });
 
-const dropSchema = new Schema<Drop>({
+schemaAbstraction.defineSchema("Drop", {
   city: {
     type: String,
     required: true,
@@ -95,13 +109,13 @@ const dropSchema = new Schema<Drop>({
   landmark: [String],
 });
 
-const busSchema = new Schema<Bus>({
+schemaAbstraction.defineSchema("Bus", {
   name: {
     type: String,
     required: true,
   },
-  pickup: [pickupSchema],
-  drop: [dropSchema],
+  pickup: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pickup" }],
+  drop: [{ type: mongoose.Schema.Types.ObjectId, ref: "Drop" }],
   bustype: {
     type: String,
     required: true,
@@ -114,9 +128,9 @@ const busSchema = new Schema<Bus>({
     type: Number,
     default: 0,
   },
-  seats: [seatSchema],
+  seats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Seat" }],
 });
 
-const Busmodel: Model<Bus> = mongoose.model("Bus", busSchema);
+const BusModel: any = schemaAbstraction.getModel("Bus");
 
-export default Busmodel;
+export default BusModel;

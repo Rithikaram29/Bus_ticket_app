@@ -2,6 +2,9 @@ import Bus from "../models/busModel";
 import { UserRole } from "../models/userDetailModel";
 import { Request, RequestHandler, Response } from "express";
 import { Types } from "mongoose";
+import DataQueryAbstraction from "../abstraction/databaseMethodAbstraction";
+
+const busServices = new DataQueryAbstraction(Bus);
 
 //interface structure
 enum SeatType {
@@ -41,7 +44,7 @@ const bookTicket: RequestHandler = async (
   const busId = req.params.id; //assuming once we are directed to the bus page, the id is added in the params
 
   try {
-    const currentBus = await Bus.findById(busId);
+    const currentBus: any = await busServices.findById(busId);
 
     if (!currentBus) {
       res.status(404).json({ error: "bus not found" });
@@ -57,7 +60,7 @@ const bookTicket: RequestHandler = async (
     //using the eselected seatnumber to check if that is already booked to avoid error
     const bookedSeats = currentBus
       ? currentBus.seats.filter(
-          (seat) =>
+          (seat: any) =>
             selectedSeatNumbers.includes(seat.seatNumber) &&
             seat.availability === false
         )
@@ -66,7 +69,7 @@ const bookTicket: RequestHandler = async (
     if (bookedSeats.length > 0) {
       res.status(404).json({
         error: "Some seats are already booked",
-        seatNum: bookedSeats.map((seat) => seat.seatNumber),
+        seatNum: bookedSeats.map((seat: any) => seat.seatNumber),
       });
     } else {
       currentBus
@@ -102,7 +105,7 @@ const cancelTicket: RequestHandler = async (
 ) => {
   const busId = req.params.id; //assuming once we are directed to the bus page, the id is added in the params
   try {
-    const currentBus = await Bus.findById(busId);
+    const currentBus: any = await busServices.findById(busId);
 
     if (!currentBus) {
       res.status(404).json({ error: "bus not found" });
@@ -117,7 +120,7 @@ const cancelTicket: RequestHandler = async (
     //using the eselected seatnumber to check if that is already booked to avoid error
     const bookedSeats = currentBus
       ? currentBus.seats.filter(
-          (seat) =>
+          (seat: any) =>
             selectedSeatNumbers.includes(seat.seatNumber) &&
             seat.availability === true
         )
@@ -126,11 +129,11 @@ const cancelTicket: RequestHandler = async (
     if (bookedSeats.length > 0) {
       res.status(404).json({
         error: "Some seats are not booked by you",
-        seatNum: bookedSeats.map((seat) => seat.seatNumber),
+        seatNum: bookedSeats.map((seat: any) => seat.seatNumber),
       });
     } else {
       currentBus
-        ? currentBus.seats.map((seat) => {
+        ? currentBus.seats.map((seat: any) => {
             if (selectedSeatNumbers.includes(seat.seatNumber)) {
               seat.availability = true;
             }
@@ -151,7 +154,7 @@ const getBusdetails: RequestHandler = async (
 ) => {
   try {
     if (req.user.role === UserRole.CUSTOMER) {
-      const allBuses = await Bus.find({}, { "seats.assignedTo": 0 });
+      const allBuses = await busServices.find({}, { "seats.assignedTo": 0 });
       res.status(400).json(allBuses);
     } else {
       res.status(500).json({ error: "Not Authorised!" });

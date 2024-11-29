@@ -1,4 +1,7 @@
 import mongoose, { Model, Document, Schema } from "mongoose";
+import SchemaAbstraction from "../abstraction/modelAbstraction";
+
+const schemaAbstraction = new SchemaAbstraction();
 
 enum UserRole {
   ADMIN = "admin",
@@ -17,7 +20,7 @@ interface NewUser extends Document {
   name?: string;
 }
 
-const userDetails = new Schema<NewUser>({
+schemaAbstraction.defineSchema("User", {
   userName: {
     type: String,
     required: true,
@@ -46,6 +49,6 @@ const userDetails = new Schema<NewUser>({
   name: { type: String },
 });
 
-const User: Model<NewUser> = mongoose.model("User", userDetails);
+const User: Model<NewUser> = schemaAbstraction.getModel("User");
 
 export { User, UserRole };
