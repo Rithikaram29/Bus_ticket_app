@@ -1,0 +1,21 @@
+.main{
+    display: flex;
+    flex-direction: column;
+    margin:1%;
+
+}
+
+
+.form{
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 600px;
+    
+}
+
+input{
+    width: 600px;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
