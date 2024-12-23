@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./style/searchBar.css";
-import { faRightLeft } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
-import SeatGrid from "../utils/seatGrid";
+// import { faRightLeft } from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import axios from "axios";
+// import SeatGrid from "./seatGrid";
+import { useNavigate } from "react-router-dom";
 
 const SearchBar: React.FC = () => {
   const today: string = new Date().toISOString().split("T")[0]; // Ensures the type is string
@@ -13,9 +14,10 @@ const SearchBar: React.FC = () => {
     date: today,
   });
 
-  const [searchResults, setSearchResults] = useState<any>(null); // State to store search results or error
-  const [selectedTrip, setSelectedTrip] = useState<any>(null);
-  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const navigate = useNavigate()
+  // const [searchResults, setSearchResults] = useState<any>(null); // State to store search results or error
+  // const [selectedTrip, setSelectedTrip] = useState<any>(null);
+  // const [showPopup, setShowPopup] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,46 +26,40 @@ const SearchBar: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     // Convert `from` and `to` values to lowercase
     const processedData = {
       ...inputdata,
       from: inputdata.from.toLowerCase(),
       to: inputdata.to.toLowerCase(),
     };
-
-    try {
-      const response = await axios.get("http://localhost:4000/user/findbus", {
-        params: processedData, // Send processed data as query parameters
-      });
-
-      console.log(response.data);
-      setSearchResults(response.data); // Update results on success
-    } catch (error: any) {
-      console.error("Error fetching bus details:", error);
-      setSearchResults({ error: "Failed to fetch bus details." }); // Update error message
-    }
+  
+    // Store `from`, `to`, and `date` in localStorage
+    localStorage.setItem("searchData", JSON.stringify(processedData));
+  
+    // Navigate to the search page
+    navigate("/search");
   };
 
-  const changeLocation = (e: React.FormEvent) => {
-    e.preventDefault();
-    setInputData({
-      ...inputdata,
-      from: inputdata.to,
-      to: inputdata.from,
-    });
-  };
+  // const changeLocation = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setInputData({
+  //     ...inputdata,
+  //     from: inputdata.to,
+  //     to: inputdata.from,
+  //   });
+  // };
 
   // Updated openSeat function to include busNo
-  const openSeat = (bus: any, currentTrip: any) => {
-    setSelectedTrip([bus, currentTrip]);
-    setShowPopup(true);
-  };
+  // const openSeat = (bus: any, currentTrip: any) => {
+  //   setSelectedTrip([bus, currentTrip]);
+  //   setShowPopup(true);
+  // };
 
   return (
     <>
       <div>
-        <form className="mainform">
+        <form className="mainform flex-row">
           <div>
             <label>From</label>
             <input
@@ -73,9 +69,9 @@ const SearchBar: React.FC = () => {
               onChange={handleChange}
             />
           </div>
-          <button onClick={changeLocation} className="swap">
+          {/* <button onClick={changeLocation} className="swap">
             <FontAwesomeIcon icon={faRightLeft} />
-          </button>
+          </button> */}
           <div>
             <label>To</label>
             <input
@@ -98,14 +94,17 @@ const SearchBar: React.FC = () => {
             Search Buses
           </button>
         </form>
-        {searchResults && (
+        {/* {searchResults && (
           <div className="results">
             {searchResults.error ? (
               <p className="error">{searchResults.error}</p>
             ) : (
               <ul>
                 {searchResults.map((bus: any, index: number) => (
-                  <div key={index} className="buscard">
+                  <div
+                    key={index}
+                    className="buscard flex-col shadow-lg mb-4 w-80 m-3 px-3 py-2"
+                  >
                     <li>{bus.busNo}</li>{" "}
                     <div>
                       {bus.trips.length > 0
@@ -134,6 +133,7 @@ const SearchBar: React.FC = () => {
                                       openSeat(bus, trip);
                                       console.log(selectedTrip);
                                     }}
+                                    className="p-1 px-3 shadow-md rounded-sm hover:opacity-60 hover:bg-slate-100"
                                   >
                                     Seats
                                   </button>
@@ -149,16 +149,32 @@ const SearchBar: React.FC = () => {
               </ul>
             )}
           </div>
-        )}
+        )} */}
       </div>
-      {showPopup && selectedTrip && (
-        <div className="popup">
-          {selectedTrip[0].seats ? <SeatGrid seatData={{date: inputdata.date,busno:selectedTrip[0].busNo,...selectedTrip[0].seats,...selectedTrip[1] }}/> : null}
-          <button onClick={()=>setShowPopup(false)}>HIDE SEATS</button>
+      {/* {showPopup && selectedTrip && (
+        <div className="popupmain">
+          <div className="popup">
+            <button
+              onClick={() => setShowPopup(false)}
+              className="p-2 rounded-sm shadow-md hover:bg-slate-300"
+            >
+              HIDE SEATS
+            </button>
+            {selectedTrip[0].seats ? (
+              <SeatGrid
+                seatData={{
+                  date: inputdata.date,
+                  busNo: selectedTrip[0].busNo,
+                  ...selectedTrip[0].seats,
+                  ...selectedTrip[1],
+                }}
+              />
+            ) : null}
+          </div>
         </div>
-      )}
+      )} */}
     </>
   );
-}; 
+};
 
 export default SearchBar;

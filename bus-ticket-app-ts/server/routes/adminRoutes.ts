@@ -4,19 +4,18 @@ import {
   createBus,
   resetTickets,
   getBuses,
-  addBusToCalendarDates,
-  getCalendarDetails,
-  getBusdetails
+  getBusdetails,
+  updateBus
 } from "../controllers/adminControllers";
 
 const router = Router();
 
 router.get("/bus", getBuses);
 
-router.get("/calendar", getCalendarDetails)
+
 router.get("/bus/details/:id", getBusdetails)
 router.post("/bus/create", createBus);
-router.post("/bus/addtodate",addBusToCalendarDates)
+router.put("/bus/add-trip/:id", updateBus)
 router.put("/ticket-reset/:id", resetTickets);
 
 export default router;

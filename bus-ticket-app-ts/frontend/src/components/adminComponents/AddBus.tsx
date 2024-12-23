@@ -19,7 +19,7 @@ interface Trip {
 }
 
 interface BusForm {
-  busno: string;
+  busNo: string;
   busName: string;
   isAc: boolean;
   seats: SeatsStructure;
@@ -27,7 +27,7 @@ interface BusForm {
 }
 
 const initialFormState: BusForm = {
-  busno: "",
+  busNo: "",
   busName: "",
   isAc: false,
   seats: {
@@ -113,12 +113,12 @@ const BusFormComponent: React.FC = () => {
     setLoading(true);
     setMessage(null);
 
-    // Log form data to ensure busno is set correctly
+    // Log form data to ensure busNo is set correctly
     
 
-    if (!formData.busno) {
+    if (!formData.busNo) {
       setMessage("Bus number is required.");
-      console.log("busno not there");
+      console.log("busNo not there");
       setLoading(false);
       return;
     }
@@ -133,15 +133,15 @@ const BusFormComponent: React.FC = () => {
           },
         }
       );
-      console.log(response);
+      console.log(response.data);
 
       alert("Bus created successfully");
       setFormData(initialFormState);
       
       if (response.status === 201) navigate("/");
     } catch (error: any) {
-      setMessage("Error adding bus. Please try again.");
-      console.error(error);
+      setMessage(error.response.data.error? error.response.data.error:"Error adding bus. Please try again.");
+      error.response.data.error && (alert(`${error.response.data.error} Add a different bus Number`));
     } finally {
       setLoading(false);
     }
@@ -159,8 +159,8 @@ const BusFormComponent: React.FC = () => {
             Bus Number:
             <input
               type="text"
-              name="busno"
-              value={formData.busno}
+              name="busNo"
+              value={formData.busNo}
               onChange={handleInputChange}
               required
             />

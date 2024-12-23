@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./style/login.css"
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
+const navigate = useNavigate()
 
   const loginHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +25,9 @@ const Login: React.FC = () => {
       localStorage.setItem("authToken", response.data);
 
       // Redirect or refresh the page
-      window.location.href = "/";
+      // window.location.href = "/";
 
+      navigate(-1)
       
     } catch (error: any) {
       setMessage("Error logging in. Please try again.");
@@ -36,7 +39,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="main m-20">
-      <div className="">
+      <div className="divclose">
         <h1 className="text-2xl font-bold text-gray-800 text-center max-w-96">Login</h1>
         <form onSubmit={loginHandler} className="form">
           <div>
@@ -77,7 +80,7 @@ const Login: React.FC = () => {
           </div>
           <button
             type="submit"
-            className={`w-full mt-4 py-2 px-4 font-semibold text-white rounded-lg shadow-md ${
+            className={`w-[50%] mt-4 py-2 px-4 font-semibold text-white rounded-lg shadow-md ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"

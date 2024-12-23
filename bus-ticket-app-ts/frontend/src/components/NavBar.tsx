@@ -10,6 +10,7 @@ const NavBar: React.FC = () => {
   const [isOpen, setOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
+
   const handleAccountClick = () => {
     setOpen(!isOpen);
   };
@@ -32,7 +33,7 @@ const NavBar: React.FC = () => {
           name: data.userName,
           role: data.role,
         };
-        setUser(currentUser); 
+        setUser(currentUser);
         // console.log(res.data);
       } catch (error: any) {
         console.log("Error fetching user:", error.message);
@@ -44,49 +45,84 @@ const NavBar: React.FC = () => {
 
   return (
     <>
-    <nav className="navbar">
-      <div className="navbar-left">
-        <img src={BusticketLogo} alt="logo" className="logo" />
-        {user && user.role === "admin" && <button>Admin Panel</button>}
-        
-      </div>
-      <div className="navbar-right">
-        <button onClick={handleAccountClick} className="account-button">
-          <FontAwesomeIcon icon={faUser} />
-          {user ? ` ${user.name}` : " Account"}
-        </button>
+      <nav className="navbar">
+        <div className="navbar-left hover:cursor-pointer" >
+          <img src={BusticketLogo} alt="logo" className="logo" onClick={()=> navigate("/")} />
+          {/* {user && user.role === "admin" && <button>Admin Panel</button>} */}
         </div>
+        <div className="navbar-right">
+          <button onClick={handleAccountClick} className="account-button">
+            <FontAwesomeIcon icon={faUser} />
+            {user ? ` ${user.name}` : " Account"}
+          </button>
+        </div>
+      </nav>
+      {isOpen && (
+        <ul className="dropdown-menu space-y-6">
+          {user ? (
+            <>
+              {user.role === "admin" ? (
+                <>
+                  {" "}
+                  <li>
+                    <button onClick={() => navigate("/admin/addbus")}>
+                     Add Bus
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => navigate("/")}>
+                     Home
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("authToken"); // Clear token on logout
+                        setUser(null);
+                        navigate("/");
+                        window.location.reload();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </li>{" "}
+                </>
+              ) : (
+                <>
+                  {" "}
+                  <li>
+                    <button onClick={() => navigate("/")}>
+                     Home
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => navigate("/user/profile")}>
+                      Profile
+                    </button>
+                  </li>
 
-    </nav>
-    {isOpen && (
-          <ul className="dropdown-menu space-y-6">
-            {user ? (
-              <>
-                <li>
-                  <button onClick={()=>navigate("/")}>Profile</button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem("authToken"); // Clear token on logout
-                      setUser(null);
-                      navigate("/");
-                      window.location.reload()
-                    }}
-                  >
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <li>
-                <button onClick={() => navigate('/login')}>
-                  Login
-                </button>
-              </li>
-            )}
-          </ul>
-        )}
+                  <li>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("authToken"); // Clear token on logout
+                        setUser(null);
+                        navigate("/");
+                        window.location.reload();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </>
+              )}
+            </>
+          ) : (
+            <li>
+              <button onClick={() => navigate("/login")}>Login</button>
+            </li>
+          )}
+        </ul>
+      )}
     </>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import './style/login.css';
+import './style/signup.css';
 
 enum UserRole {
   ADMIN = "admin",
@@ -69,7 +69,7 @@ console.log(formData)
 
   return (
     <div className="main m-20">
-      <div className="">
+      <div className="divclose ">
         <h1 className="text-2xl font-bold text-gray-800 text-center">Sign Up</h1>
         <form onSubmit={handleSubmit} className="form space-y-4">
           <div>
@@ -203,7 +203,7 @@ console.log(formData)
           </div>
           <button
             type="submit"
-            className={`w-full py-2 px-4 font-semibold text-white rounded-lg shadow-md ${
+            className={`w-[50%] py-2 px-4 font-semibold text-white rounded-lg shadow-md ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"

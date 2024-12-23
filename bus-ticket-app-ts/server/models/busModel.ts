@@ -26,7 +26,7 @@ interface SeatsStructure {
 }
 
 interface Bus extends Document {
-  busno: string;
+  busNo: string;
   busName: string;
   isAc: boolean;
   seats: SeatsStructure;
@@ -96,7 +96,7 @@ const seatsStructureSchema = schemaAbstraction.createSubSchema({
 
 // Define Bus schema
 schemaAbstraction.defineSchema("Bus", {
-  busno: {
+  busNo: {
     type: String,
     required: true,
     unique: true,

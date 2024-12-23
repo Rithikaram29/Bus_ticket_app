@@ -53,7 +53,7 @@ schemaAbstraction.defineSchema("User", {
   role: {
     type: String,
     enum: Object.values(UserRole),
-    required: true
+    required: true,
   },
 
   name: { type: String },
@@ -64,17 +64,15 @@ schemaAbstraction.defineSchema("User", {
         type: String,
         required: false,
       },
+      date: {
+        type: Date,
+        required: false,
+      },
       seats: [
         {
           seatNo: {
             type: String,
             required: true,
-            validate: {
-              validator: function (this: any, value: any) {
-                return !!this.busNo;
-              },
-              message: "Need busNo to save seats",
-            },
           },
           name: {
             type: String,

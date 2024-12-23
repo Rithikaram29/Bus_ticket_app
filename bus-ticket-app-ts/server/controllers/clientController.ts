@@ -35,62 +35,64 @@ interface CustomRequest extends Request {
 
 // To book tickets
 const bookTicket = async (req: CustomRequest, res: Response) => {
- 
-  const busno = req.params.id; 
-  const {date,seats} = req.body;
+  const busNo = req.params.id;
+  const { date, seats } = req.body;
   const userId: any = req.user?._id;
   const role = req.user?.role;
+
+  // Check for user role
   if (role !== UserRole.CUSTOMER) {
-    throw new Error("Not Authorised");
+    throw new Error("Not Authorized");
   }
+
   try {
-    //check for user
+    // Check for user existence
     const currentUser: any = await userControl.findById(userId);
     if (!currentUser) {
       res.status(404).json({ error: "User not found!" });
       return;
     }
 
-    //check for bus
-    const currentBus: any = await busServices.findOne({busno: busno});
+    // Check for bus existence
+    const currentBus: any = await busServices.findOne({ busNo: busNo });
     if (!currentBus) {
-      res.status(404).json({ error: "bus not found" });
+      res.status(404).json({ error: "Bus not found" });
       return;
     }
 
-    // Parse and filter trips for the given date
+    // Parse and filter trips for the given date (normalized to midnight)
     const parsedDate = new Date(date);
     parsedDate.setHours(0, 0, 0, 0); // Set to midnight
     const nextDay = new Date(parsedDate);
     nextDay.setDate(parsedDate.getDate() + 1);
 
+    // Find the trip that matches the selected date (considering time zone)
     const trip = currentBus.trips.find((trip: any) => {
-      return (
-        trip.pickupDateTime >= parsedDate &&
-        trip.pickupDateTime < nextDay
-      );
+      const tripDate = new Date(trip.pickupDateTime);
+      tripDate.setHours(0, 0, 0, 0); // Normalize to midnight for comparison
+      return tripDate >= parsedDate && tripDate < nextDay;
     });
 
     if (!trip) {
       res.status(404).json({ error: "No trips found for the selected date" });
       return;
     }
-    
+
     // Ensure `bookedSeats` array exists in the trip
     if (!trip.bookedSeats) {
       trip.bookedSeats = [];
     }
 
-   // Extract customer seat details
+    // Extract customer seat details
     const customerSeats = seats; // { seats: [{ seatNo: "", name: "" }] }
     const customerSeatNumbers = customerSeats.map((seat: any) => seat.seatNo);
 
-     // Check if any of the requested seats are already booked
-     const alreadyBookedSeats = trip.bookedSeats.filter((seat: any) =>
+    // Check if any of the requested seats are already booked
+    const alreadyBookedSeats = trip.bookedSeats.filter((seat: any) =>
       customerSeatNumbers.includes(seat.SeatNumber)
     );
 
-    //using the selected seatnumber to check if that is already booked to avoid error
+    // If seats are already booked, return error
     if (alreadyBookedSeats.length > 0) {
       res.status(400).json({
         error: "Some seats are already booked",
@@ -99,7 +101,7 @@ const bookTicket = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-     // Update `bookedSeats` in the bus model
+    // Update `bookedSeats` in the bus model
     const newBookedSeats = customerSeats.map((seat: any) => ({
       SeatNumber: seat.seatNo,
       assignedTo: seat.name,
@@ -109,7 +111,8 @@ const bookTicket = async (req: CustomRequest, res: Response) => {
 
     // Add ticket details to the user's `tickets`
     const newTicket = {
-      busNo: busno,
+      busNo: busNo,
+      date: trip.pickupDateTime, // Use the exact pickup date for the trip
       seats: customerSeats.map((seat: any) => ({
         seatNo: seat.seatNo,
         name: seat.name,
@@ -119,74 +122,112 @@ const bookTicket = async (req: CustomRequest, res: Response) => {
     if (!currentUser.tickets) {
       currentUser.tickets = [];
     }
+
+    // Add the new ticket to the user's tickets array
     currentUser.tickets.push(newTicket);
 
     // Save updates to the bus and user models
-    await currentBus.save();
-    await currentUser.save();
+    await busServices.save(currentBus);
+    await userControl.save(currentUser);
 
-    res.status(200).json({ message: "Tickets booked successfully!", currentBus,currentUser });
+    res
+      .status(200)
+      .json({
+        message: "Tickets booked successfully!",
+        currentBus,
+        currentUser,
+      });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 };
 
 //To cancel tickets
-
 const cancelTicket = async (req: CustomRequest, res: Response) => {
-  const busId = req.params.id; //assuming once we are directed to the bus page, the id is added in the params
+  const busNo = req.params.id;
+  const { date, seatNo } = req.body; // Assume req.body contains { date, seatNo }
   const userId: any = req.user?._id;
   const role = req.user?.role;
+
+  // Check for user role
   if (role !== UserRole.CUSTOMER) {
-    throw new Error("Not Authorised");
+    throw new Error("Not Authorized");
   }
+
   try {
-    const currentBus: any = await busServices.findById(busId);
-
-    if (!currentBus) {
-      res.status(404).json({ error: "bus not found" });
-    }
-
-    const customerSeats: SelectedSeat[] = req.body.seats; //req.body will contain object with key as seats and value as array of selected seats.
-    //structure of the incoming req.body will be {seats:[{seatNo:"", name:"", phone:"", email:""},{seatNo:"", name:"", phone:"", email:""}]}
-
-    //getting the seatnumber to be booked.
-    const customerSeatNumbers = customerSeats.map(
-      (selSeat: any) => selSeat.seatNumber
-    );
-
-    //using the eselected seatnumber to check if that is already booked to avoid error
-    const notBookedSeats = currentBus
-      ? currentBus.seats.filter(
-          (seat: any) =>
-            customerSeatNumbers.includes(seat.seatNumber) &&
-            seat.availability === true
-        )
-      : [];
-
-    if (notBookedSeats.length > 0) {
-      res.status(404).json({
-        error: "Some seats are not booked by you",
-        seatNum: notBookedSeats.map((seat: any) => seat.seatNumber),
-      });
+    // Check for user existence
+    const currentUser: any = await userControl.findOne({ _id: userId });
+    if (!currentUser) {
+      res.status(404).json({ error: "User not found!" });
       return;
-    } else {
-      currentBus
-        ? currentBus.seats.map((seat: any) => {
-            if (customerSeatNumbers.includes(seat.seatNumber)) {
-              (seat.availability = true), (seat.assignedTo = undefined);
-            }
-          })
-        : [];
     }
 
-    busServices.save(currentBus);
+    // Normalize the date provided in the request
+    const parsedDate = new Date(date);
+    parsedDate.setHours(0, 0, 0, 0); // Normalize to midnight to avoid time comparison issues
 
-    res.status(200).json({ message: "Tickets canceled successfully!" });
+    // Find the ticket for the specific bus and date
+    const ticket = currentUser.tickets.find((ticket: any) => {
+      const ticketDate = new Date(ticket.date);
+      ticketDate.setHours(0, 0, 0, 0); // Normalize to midnight for comparison
+      return ticket.busNo === busNo && ticketDate.getTime() === parsedDate.getTime();
+    });
+
+    if (!ticket) {
+      res.status(404).json({ error: "Ticket not found for the given bus and date" });
+      return;
+    }
+
+    // Check if the seat exists in the user's ticket
+    const seat = ticket.seats.find((seat: any) => seat.seatNo === seatNo);
+    if (!seat) {
+      res.status(404).json({ error: "Seat not found in the user's ticket" });
+      return;
+    }
+
+    // Remove the seat from the user's ticket
+    ticket.seats = ticket.seats.filter((seat: any) => seat.seatNo !== seatNo);
+
+    // If there are no seats left in the ticket, remove the ticket from the user's profile
+    if (ticket.seats.length === 0) {
+      currentUser.tickets = currentUser.tickets.filter((userTicket: any) => userTicket.busNo !== busNo || userTicket.date !== date);
+    }
+
+    // Update the user's tickets in the database
+    await userControl.update({ _id: userId }, { tickets: currentUser.tickets });
+
+    // Find the bus and update its bookedSeats
+    const currentBus: any = await busServices.findOne({ busNo: busNo });
+    if (!currentBus) {
+      res.status(404).json({ error: "Bus not found" });
+      return;
+    }
+
+    const trip = currentBus.trips.find((trip: any) => {
+      const tripDate = new Date(trip.pickupDateTime);
+      tripDate.setHours(0, 0, 0, 0); // Normalize to midnight for comparison
+      return tripDate.getTime() === parsedDate.getTime();
+    });
+
+    if (!trip) {
+      res.status(404).json({ error: "No trip found for the given date" });
+      return;
+    }
+
+    // Remove the canceled seat from the bus trip's bookedSeats
+    trip.bookedSeats = trip.bookedSeats.filter((seat: any) => seat.SeatNumber !== seatNo);
+
+    // Update the bus model
+    await busServices.update({ busNo: busNo }, { trips: currentBus.trips });
+
+    res.status(200).json({ message: "Ticket canceled successfully!", currentBus, currentUser });
+
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 //Get bus details
 const getBusdetails: RequestHandler = async (
@@ -220,8 +261,8 @@ const getBusdetails: RequestHandler = async (
           pickuplocation: from,
           dropLocation: to,
           pickupDateTime: {
-            $gte: parsedDate,   // Greater than or equal to the start of the day
-            $lt: nextDay,       // Less than the start of the next day
+            $gte: parsedDate, // Greater than or equal to the start of the day
+            $lt: nextDay, // Less than the start of the next day
           },
         },
       },
